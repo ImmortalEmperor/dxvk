@@ -61,10 +61,16 @@ namespace dxvk {
 
       imageInfo.shared = true;
       imageInfo.sharing.mode = hSharedHandle == INVALID_HANDLE_VALUE ? DxvkSharedHandleMode::Export : DxvkSharedHandleMode::Import;
-      imageInfo.sharing.type = (m_desc.MiscFlags & D3D11_RESOURCE_MISC_SHARED_NTHANDLE)
-        ? VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT
-        : VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_KMT_BIT;
-      imageInfo.sharing.handle = hSharedHandle;
+      // Wine on Linux has no Win32 handles, so fall back to an fd CUDA can import.
+      if (m_device->GetDXVKDevice()->features().khrExternalMemoryWin32) {
+        imageInfo.sharing.type = (m_desc.MiscFlags & D3D11_RESOURCE_MISC_SHARED_NTHANDLE)
+          ? VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT
+          : VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_KMT_BIT;
+        imageInfo.sharing.handle = hSharedHandle;
+      } else if (m_device->GetDXVKDevice()->features().khrExternalMemoryFd) {
+        imageInfo.sharing.type = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT;
+        imageInfo.sharing.fd = 0;
+      }
     }
 
     if (!pDevice->GetOptions()->disableMsaa)
@@ -1271,6 +1277,46 @@ namespace dxvk {
   }
   
   
+  HRESULT STDMETHODCALLTYPE D3D11VkInteropSurface::GetVulkanFdMemoryInfo(
+          int*                  pFd,
+          size_t*               pOffset,
+          size_t*               pSize) {
+    // The caller owns the returned fd and must close it.
+    if (!pFd || !pOffset || !pSize)
+      return E_INVALIDARG;
+
+    Com<ID3D11Device> device;
+    m_resource->GetDevice(&device);
+    auto dxvkDevice = static_cast<D3D11Device*>(device.ptr())->GetDXVKDevice();
+
+    if (!dxvkDevice->features().khrExternalMemoryFd) {
+      Logger::warn("D3D11VkInteropSurface: GetVulkanFdMemoryInfo called without VK_KHR_external_memory_fd");
+      return E_FAIL;
+    }
+
+    const Rc<DxvkImage> image = m_texture->GetImage();
+    if (!(image->info().sharing.type & VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT)) {
+      Logger::warn("D3D11VkInteropSurface: image was not created with OPAQUE_FD sharing");
+      return E_FAIL;
+    }
+
+    DxvkResourceMemoryInfo memInfo = image->getMemoryInfo();
+
+    VkMemoryGetFdInfoKHR handleInfo = { VK_STRUCTURE_TYPE_MEMORY_GET_FD_INFO_KHR };
+    handleInfo.handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT;
+    handleInfo.memory     = memInfo.memory;
+
+    if (dxvkDevice->vkd()->vkGetMemoryFdKHR(dxvkDevice->vkd()->device(), &handleInfo, pFd) != VK_SUCCESS) {
+      Logger::warn("D3D11VkInteropSurface: vkGetMemoryFdKHR failed");
+      return E_FAIL;
+    }
+
+    *pOffset = memInfo.offset;
+    *pSize   = memInfo.size;
+    return S_OK;
+  }
+
+
   ///////////////////////////////////////////
   //      D 3 D 1 1 T E X T U R E 1 D
   D3D11Texture1D::D3D11Texture1D(

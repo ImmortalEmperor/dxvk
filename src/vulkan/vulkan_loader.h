@@ -499,6 +499,14 @@ namespace dxvk::vk {
     VULKAN_FN(vkImportSemaphoreWin32HandleKHR);
     #endif
 
+    #ifdef VK_KHR_external_memory_fd
+    VULKAN_FN(vkGetMemoryFdKHR);
+    #endif
+
+    #ifdef VK_KHR_external_semaphore_fd
+    VULKAN_FN(vkGetSemaphoreFdKHR);
+    #endif
+
     #ifdef VK_KHR_maintenance5
     VULKAN_FN(vkCmdBindIndexBuffer2KHR);
     VULKAN_FN(vkGetRenderingAreaGranularityKHR);

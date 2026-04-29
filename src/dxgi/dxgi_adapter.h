@@ -32,6 +32,8 @@ namespace dxvk {
             VkInstance*               pInstance,
             VkPhysicalDevice*         pPhysDev);
 
+    void STDMETHODCALLTYPE GetAdapterUUID(char* OutUUID);
+
   private:
 
     DxgiAdapter* m_adapter;

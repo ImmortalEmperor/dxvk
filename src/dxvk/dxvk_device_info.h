@@ -94,6 +94,8 @@ namespace dxvk {
     VkBool32                                                  khrExternalMemoryWin32          = VK_FALSE;
     VkBool32                                                  khrExternalSemaphoreWin32       = VK_FALSE;
     VkBool32                                                  khrIncrementalPresent           = VK_FALSE;
+    VkBool32                                                  khrExternalMemoryFd             = VK_FALSE;
+    VkBool32                                                  khrExternalSemaphoreFd          = VK_FALSE;
     VkBool32                                                  khrLoadStoreOpNone              = VK_FALSE;
     VkPhysicalDeviceMaintenance5FeaturesKHR                   khrMaintenance5                 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_5_FEATURES_KHR };
     VkPhysicalDeviceMaintenance6FeaturesKHR                   khrMaintenance6                 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_6_FEATURES_KHR };
@@ -172,6 +174,8 @@ namespace dxvk {
     VkExtensionProperties khrExternalMemoryWin32            = vk::makeExtension(VK_KHR_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME);
     VkExtensionProperties khrExternalSemaphoreWin32         = vk::makeExtension(VK_KHR_EXTERNAL_SEMAPHORE_WIN32_EXTENSION_NAME);
     VkExtensionProperties khrIncrementalPresent             = vk::makeExtension(VK_KHR_INCREMENTAL_PRESENT_EXTENSION_NAME);
+    VkExtensionProperties khrExternalMemoryFd               = vk::makeExtension(VK_KHR_EXTERNAL_MEMORY_FD_EXTENSION_NAME);
+    VkExtensionProperties khrExternalSemaphoreFd            = vk::makeExtension(VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME);
     VkExtensionProperties khrLoadStoreOpNone                = vk::makeExtension(VK_KHR_LOAD_STORE_OP_NONE_EXTENSION_NAME);
     VkExtensionProperties khrMaintenance5                   = vk::makeExtension(VK_KHR_MAINTENANCE_5_EXTENSION_NAME);
     VkExtensionProperties khrMaintenance6                   = vk::makeExtension(VK_KHR_MAINTENANCE_6_EXTENSION_NAME);

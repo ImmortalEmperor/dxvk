@@ -736,9 +736,14 @@ namespace dxvk {
             VkImage*              pHandle,
             VkImageLayout*        pLayout,
             VkImageCreateInfo*    pInfo);
-    
+
+    HRESULT STDMETHODCALLTYPE GetVulkanFdMemoryInfo(
+            int*                  pFd,
+            size_t*               pOffset,
+            size_t*               pSize);
+
   private:
-    
+
     ID3D11Resource*     m_resource;
     D3D11CommonTexture* m_texture;
 

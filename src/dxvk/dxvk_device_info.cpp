@@ -50,6 +50,8 @@ namespace dxvk {
     HANDLE_EXT(khrExternalMemoryWin32);            \
     HANDLE_EXT(khrExternalSemaphoreWin32);         \
     HANDLE_EXT(khrIncrementalPresent);             \
+    HANDLE_EXT(khrExternalMemoryFd);               \
+    HANDLE_EXT(khrExternalSemaphoreFd);            \
     HANDLE_EXT(khrLoadStoreOpNone);                \
     HANDLE_EXT(khrMaintenance5);                   \
     HANDLE_EXT(khrMaintenance6);                   \
@@ -1050,6 +1052,10 @@ namespace dxvk {
       /* External memory features for wine */
       ENABLE_EXT(khrExternalMemoryWin32, false),
       ENABLE_EXT(khrExternalSemaphoreWin32, false),
+
+      /* For CUDA interop on Linux. Win32 handles can't be used outside Wine. */
+      ENABLE_EXT(khrExternalMemoryFd, false),
+      ENABLE_EXT(khrExternalSemaphoreFd, false),
 
       /* Dirty rects for presentation */
       ENABLE_EXT(khrIncrementalPresent, false),

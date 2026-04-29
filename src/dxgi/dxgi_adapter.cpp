@@ -54,6 +54,14 @@ namespace dxvk {
   }
 
 
+  void STDMETHODCALLTYPE DxgiVkAdapter::GetAdapterUUID(char* OutUUID) {
+    if (!OutUUID)
+      return;
+    auto info = m_adapter->GetDXVKAdapter()->info();
+    std::memcpy(OutUUID, info.deviceUuid, VK_UUID_SIZE);
+  }
+
+
 
 
   DxgiAdapter::DxgiAdapter(

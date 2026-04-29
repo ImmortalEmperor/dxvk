@@ -316,6 +316,21 @@ IDXGIVkInteropSurface : public IUnknown {
           VkImage*              pHandle,
           VkImageLayout*        pLayout,
           VkImageCreateInfo*    pInfo) = 0;
+
+  /**
+   * \brief Retrieves an OPAQUE_FD memory handle for the surface
+   *
+   * Lets CUDA import the image on Linux. The caller must close the fd.
+   *
+   * \param [out] pFd FD referring to the device memory
+   * \param [out] pOffset Offset of the image inside the memory object
+   * \param [out] pSize Size of the underlying memory allocation
+   * \returns \c S_OK on success, \c E_FAIL if the fd can't be exported
+   */
+  virtual HRESULT STDMETHODCALLTYPE GetVulkanFdMemoryInfo(
+          int*                  pFd,
+          size_t*               pOffset,
+          size_t*               pSize) = 0;
 };
 
 
@@ -490,6 +505,14 @@ IDXGIVkInteropAdapter : public IUnknown {
   virtual void STDMETHODCALLTYPE GetVulkanHandles(
           VkInstance*           pInstance,
           VkPhysicalDevice*     pPhysDev) = 0;
+
+  /**
+   * \brief Copies the Vulkan adapter UUID
+   *
+   * Used to match a DXVK adapter to a CUDA device.
+   * \param [out] OutUUID 16-byte destination buffer
+   */
+  virtual void STDMETHODCALLTYPE GetAdapterUUID(char* OutUUID) = 0;
 };
 
 /**

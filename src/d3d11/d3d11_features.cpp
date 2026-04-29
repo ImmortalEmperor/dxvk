@@ -245,7 +245,8 @@ namespace dxvk {
 
     // Lie about supporting Tier 1 since that's the
     // minimum required tier for Feature Level 11_1
-    if (!Device.features().khrExternalMemoryWin32) {
+    // Wine on Linux has no Win32 handles, so also accept the FD path.
+    if (!Device.features().khrExternalMemoryWin32 && !Device.features().khrExternalMemoryFd) {
       if (!s_errorShown.exchange(true))
         Logger::warn("D3D11DeviceFeatures: External memory features not supported");
 
